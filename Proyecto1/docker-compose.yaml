@@ -2,7 +2,8 @@ version: "3.8"
 
 services:
   mysql:
-    build: ./db # Usamos el Dockerfile del directorio actual
+    # build: ./db # Usamos el Dockerfile del directorio actual
+    image: diegomrza/mysql_db:latest
     container_name: mysql-container
     environment:
       - MYSQL_ROOT_PASSWORD=1234
@@ -16,13 +17,15 @@ services:
       - ./db/Script.sql:/docker-entrypoint-initdb.d/Script.sql # Script de inicialización
     restart: unless-stopped # Reiniciar el contenedor si se detiene inesperadamente
   imggo:
-    build: ./backend # Usar el Dockerfile del directorio backend
+    # build: ./backend # Usar el Dockerfile del directorio backend
+    image: diegomrza/goservice:latest
     container_name: go-container
     ports:
       - "5200:5200" # Exponer el puerto 5200
     restart: unless-stopped # Reiniciar el contenedor si se detiene inesperadamente
   nodejs:
-    build: ./api # Usar el Dockerfile del directorio nodejs
+    # build: ./api # Usar el Dockerfile del directorio nodejs
+    image: diegomrza/nodejsapi:latest
     container_name: nodejs-container
     ports:
       - "3000:3000" # Exponer el puerto 3000

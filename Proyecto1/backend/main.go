@@ -53,96 +53,92 @@ func postScheduledData() {
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println("======= DATOS MODULO CPU =======")
-			fmt.Println(" ")
+			// ! fmt.Println("======= DATOS MODULO CPU =======")
+			// ! fmt.Println(" ")
 
 			cmdCpu := exec.Command("sh", "-c", "cat /proc/cpu_201901429")
 			outCpu, errCpu := cmdCpu.CombinedOutput()
 			if errCpu != nil {
-				fmt.Println(errCpu)
+				fmt.Println(errCpu) // Imprimir el error
 			}
 
-			//---CPU
-			fmt.Println("======= CPU =======")
+			// ! ---CPU
+			// ! fmt.Println("======= CPU =======")
 			var cpu_info Cpu
 			err := json.Unmarshal([]byte(outCpu), &cpu_info)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(err) // Imprimir el error
 			}
 
 			//Mandar el post
 			url := "http://nodejs-container:3000/cpu"
-			fmt.Println(url)
+			// ! fmt.Println(url)
 
 			//Manda cpu_info que es un json
 			p_cpu, err := cpu.Percent(time.Second, false)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(err) // Imprimir el error
 			}
 			cpu_info.Usage = p_cpu[0]
 			jsonValue, _ := json.Marshal(cpu_info)
-			fmt.Println("Esto es lo que se manda")
-			// fmt.Println(string(jsonValue))
+			// ! fmt.Println("Esto es lo que se manda")
+			// ! fmt.Println(string(jsonValue))
 
-
-			// Mandar el json a la url
+			// ? Mandar el json a la url
 			response, err := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(err) // Imprimir el error
 			} else {
 				defer response.Body.Close()
 				responseBody, err := ioutil.ReadAll(response.Body)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println(err) // Imprimir el error
 				} else {
 					fmt.Println("\x1b[32m", string(responseBody), "\x1b[0m")
 				}
 			}
 
-
-			fmt.Println(" ")
-			fmt.Println("======= DATOS MODULO RAM =======")
-			fmt.Println(" ")
+			// ! fmt.Println(" ")
+			// ! fmt.Println("======= DATOS MODULO RAM =======")
+			// ! fmt.Println(" ")
 
 			cmdRam := exec.Command("sh", "-c", "cat /proc/ram_201901429")
 			outRam, errRam := cmdRam.CombinedOutput()
 			if errRam != nil {
-				fmt.Println(errRam)
+				fmt.Println(errRam) // Imprimir el error
 			}
-			//---RAM
-			fmt.Println("======= RAM =======")
+			// ! ---RAM
+			// ! fmt.Println("======= RAM =======")
 			var ram_info Ram
 			err = json.Unmarshal([]byte(outRam), &ram_info)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(err) // Imprimir el error
 			}
 
 			// Mandar respuesta
 			url = "http://nodejs-container:3000/ram"
-			fmt.Println(url)
+			// ! fmt.Println(url)
 
 			// Manda ram_info que es un json
 			jsonValue, _ = json.Marshal(ram_info)
 
-			// fmt.Println(string(jsonValue))
+			// ! fmt.Println(string(jsonValue))
 
-
-			//Mandar el json a la url
+			// ? Mandar el json a la url
 			response, err = http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(err) // Imprimir el error
 			} else {
 				defer response.Body.Close()
 				responseBody, err := ioutil.ReadAll(response.Body)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println(err) // Imprimir el error
 				} else {
 					fmt.Println("\x1b[32m", string(responseBody), "\x1b[0m")
 				}
 			}
 
-
-			fmt.Println(" ")
+			// ! fmt.Println(" ")
 		}
 	}
 }

@@ -3,10 +3,21 @@ const mysql = require('mysql2');
 
 // Conexión a MySQL
 const connection = mysql.createConnection({
-    host: 'localhost', // Si estás usando Docker, puede ser el nombre del contenedor o "localhost"
-    user: 'root',      // Usuario MySQL
-    password: '1234', // Contraseña de MySQL
-    database: 'datos', // Nombre de la base de datos
+    host: 'mysql-container',    // Puede ser el nombre del contenedor o "localhost"
+    user: 'root',               // Usuario MySQL
+    password: '1234',           // Contraseña de MySQL
+    database: 'datos',          // Nombre de la base de datos
+});
+
+// Crear un pool de conexiones
+const pool = mysql.createPool({
+    host: 'mysql-container',
+    user: 'root',
+    database: 'datos',
+    password: '1234',
+    waitForConnections: true,
+    connectionLimit: 10,        // Ajustar según el uso
+    queueLimit: 0
 });
 
 const app = express();
@@ -24,13 +35,13 @@ connection.connect(err => {
 
 /* ======================================== INICIO ======================================== */
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('<h1>Hello World!</h1>');
 });
 
 /* ======================================== IDs ======================================== */
 // Obteniendo los ids
 app.get('/obtenerIds', (req, res) => {
-    connection.query('SELECT * FROM t1', (err, results) => {
+    pool.query('SELECT * FROM t1', (err, results) => {
         if (err) {
             return res.status(500).send('Error al obtener los usuarios');
         }
@@ -42,7 +53,7 @@ app.get('/obtenerIds', (req, res) => {
 app.post('/insertarId', (req, res) => {
     const { id } = req.body;
 
-    connection.query('INSERT INTO t1 (id) VALUES (?) ON DUPLICATE KEY UPDATE id = id', [id], (err, results) => {
+    pool.query('INSERT INTO t1 (id) VALUES (?) ON DUPLICATE KEY UPDATE id = id', [id], (err, results) => {
         if (err) {
             return res.status(500).send('Error al insertar el usuario');
         }
@@ -53,7 +64,7 @@ app.post('/insertarId', (req, res) => {
 /* ======================================== PROCESOS ======================================== */
 // Obteniendo los procesos
 app.get('/obtenerProcesos', (req, res) => {
-    connection.query('SELECT * FROM PROCESO', (err, results) => {
+    pool.query('SELECT * FROM PROCESO', (err, results) => {
         if (err) {
             return res.status(500).send('Error al obtener los procesos');
         }
@@ -65,7 +76,7 @@ app.get('/obtenerProcesos', (req, res) => {
 app.post('/obtenerProceso', (req, res) => {
     const { pid } = req.body;
 
-    connection.query('SELECT * FROM PROCESO WHERE pid = ?', [pid], (err, results) => {
+    pool.query('SELECT * FROM PROCESO WHERE pid = ?', [pid], (err, results) => {
         if (err) {
             return res.status(500).send('Error al obtener el proceso');
         }
@@ -77,7 +88,7 @@ app.post('/obtenerProceso', (req, res) => {
 app.post('/insertarProceso', (req, res) => {
     const { pid, name, user, state, ram } = req.body;
 
-    connection.query('INSERT INTO PROCESO (pid, name, user, state, ram) VALUES (?, ?, ?, ?, ?)', [pid, name, user, state, ram], (err, results) => {
+    pool.query('INSERT INTO PROCESO (pid, name, user, state, ram) VALUES (?, ?, ?, ?, ?)', [pid, name, user, state, ram], (err, results) => {
         if (err) {
             return res.status(500).send('Error al insertar el proceso');
         }
@@ -89,14 +100,22 @@ app.post('/insertarProceso', (req, res) => {
 app.post('/cpu', (req, res) => {
     const { percentage_used, tasks } = req.body;
 
-    console.log(percentage_used);
-    console.log(tasks);
+    // console.log(percentage_used);
+    // imprimir solo las task que tengan ram diferente de 0 => { pid: 180, name: 'kstrp', user: 0, state: 1026, ram: 0, father: 2 },
 
-    // connection.query('INSERT INTO CPU (pid, name, user, state, ram) VALUES (?, ?, ?, ?, ?)', [pid, name, user, state, ram], (err, results) => {
-    //     if (err) {
-    //         return res.status(500).send('Error al insertar el proceso');
+    // console.log(tasks);
+
+    // tasks.forEach(task => {
+    //     if (task.ram != 0) {
+    //         console.log(task);
     //     }
-    //     res.send('Proceso insertado correctamente');
+    // });
+
+    // pool.query('INSERT INTO CPU (pid, name, user, state, ram) VALUES (?, ?, ?, ?, ?)', [pid, name, user, state, ram], (err, results) => {
+    //     if (err) {
+    //         return res.status(500).send('Error al insertar el proceso CPU');
+    //     }
+    //     res.send('Proceso !! CPU !! insertado correctamente');
     // });
 
     res.send('Proceso CPU insertado correctamente');
@@ -106,19 +125,28 @@ app.post('/cpu', (req, res) => {
 app.post('/ram', (req, res) => {
     const { total_ram, free_ram, used_ram, percentage_used } = req.body;
 
-    console.log(total_ram);
-    console.log(free_ram);
-    console.log(used_ram);
-    console.log(percentage_used);
+    // console.log(total_ram);
+    // console.log(free_ram);
+    // console.log(used_ram);
+    // console.log(percentage_used);
 
-    // connection.query('INSERT INTO RAM (total_ram, free_ram, used_ram, percentage_used, ram) VALUES (?, ?, ?, ?, ?)', [total_ram, free_ram, used_ram, percentage_used], (err, results) => {
+    // connection.query('INSERT INTO ram (total, free, used, perc) VALUES (?, ?, ?, ?, ?)', [total_ram, free_ram, used_ram, percentage_used], (err, results) => {
     //     if (err) {
-    //         return res.status(500).send('Error al insertar el proceso');
+    //         console.log(err);
+    //         return res.status(500).send('Error al insertar el proceso RAM');
     //     }
     //     res.send('Proceso insertado correctamente');
     // });
 
-    res.send('Proceso RAM insertado correctamente');
+    pool.query('INSERT INTO ram (total, free, used, perc) VALUES (?, ?, ?, ?)',
+        [total_ram, free_ram, used_ram, percentage_used],
+        (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send('Error al insertar el proceso RAM');
+            }
+            res.send('Proceso !! RAM !! insertado correctamente');
+        });
 });
 
 /* ======================================== CONFIGURACION ======================================== */
