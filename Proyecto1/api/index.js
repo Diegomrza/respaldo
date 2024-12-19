@@ -6,7 +6,7 @@ const connection = mysql.createConnection({
     host: 'localhost', // Si estás usando Docker, puede ser el nombre del contenedor o "localhost"
     user: 'root',      // Usuario MySQL
     password: '1234', // Contraseña de MySQL
-    database: 'prueba', // Nombre de la base de datos
+    database: 'datos', // Nombre de la base de datos
 });
 
 const app = express();
@@ -83,6 +83,42 @@ app.post('/insertarProceso', (req, res) => {
         }
         res.send('Proceso insertado correctamente');
     });
+});
+
+/* ======================================== CPU ======================================== */
+app.post('/cpu', (req, res) => {
+    const { percentage_used, tasks } = req.body;
+
+    console.log(percentage_used);
+    console.log(tasks);
+
+    // connection.query('INSERT INTO CPU (pid, name, user, state, ram) VALUES (?, ?, ?, ?, ?)', [pid, name, user, state, ram], (err, results) => {
+    //     if (err) {
+    //         return res.status(500).send('Error al insertar el proceso');
+    //     }
+    //     res.send('Proceso insertado correctamente');
+    // });
+
+    res.send('Proceso CPU insertado correctamente');
+});
+
+/* ======================================== RAM ======================================== */
+app.post('/ram', (req, res) => {
+    const { total_ram, free_ram, used_ram, percentage_used } = req.body;
+
+    console.log(total_ram);
+    console.log(free_ram);
+    console.log(used_ram);
+    console.log(percentage_used);
+
+    // connection.query('INSERT INTO RAM (total_ram, free_ram, used_ram, percentage_used, ram) VALUES (?, ?, ?, ?, ?)', [total_ram, free_ram, used_ram, percentage_used], (err, results) => {
+    //     if (err) {
+    //         return res.status(500).send('Error al insertar el proceso');
+    //     }
+    //     res.send('Proceso insertado correctamente');
+    // });
+
+    res.send('Proceso RAM insertado correctamente');
 });
 
 /* ======================================== CONFIGURACION ======================================== */

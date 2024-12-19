@@ -2,18 +2,33 @@ version: "3.8"
 
 services:
   mysql:
-    build: . # Usamos el Dockerfile del directorio actual
+    build: ./db # Usamos el Dockerfile del directorio actual
     container_name: mysql-container
     environment:
       - MYSQL_ROOT_PASSWORD=1234
-      - MYSQL_DATABASE=prueba
+      - MYSQL_DATABASE=datos
       - MYSQL_USER=squery
-      - MYSQL_PASSWORD=12345
+      - MYSQL_PASSWORD=1234
     ports:
       - "3306:3306" # Exponer el puerto 3306
     volumes:
       - mysql_data:/var/lib/mysql # Volumen para persistir los datos
+      - ./db/Script.sql:/docker-entrypoint-initdb.d/Script.sql # Script de inicialización
     restart: unless-stopped # Reiniciar el contenedor si se detiene inesperadamente
+  imggo:
+    build: ./backend # Usar el Dockerfile del directorio backend
+    container_name: go-container
+    ports:
+      - "5200:5200" # Exponer el puerto 5200
+    restart: unless-stopped # Reiniciar el contenedor si se detiene inesperadamente
+  nodejs:
+    build: ./api # Usar el Dockerfile del directorio nodejs
+    container_name: nodejs-container
+    ports:
+      - "3000:3000" # Exponer el puerto 3000
+    restart: unless-stopped # Reiniciar el contenedor si se detiene inesperadamente
+    depends_on:
+      - mysql # Dependencia del servicio mysql
 
 # Definir un volumen persistente para los datos
 volumes:
