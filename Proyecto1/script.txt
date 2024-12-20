@@ -1,0 +1,66 @@
+cd /home/ubuntu
+sudo mkdir sopes
+cd sopes
+
+sudo apt update -y
+sudo apt install git -y
+git --version
+
+# instalar docker
+sudo apt-get update -y
+sudo apt-get install ca-certificates curl gnupg -y
+
+sudo install -m 0755 -d /etc/apt/keyrings -y
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update -y
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+docker version
+docker compose version
+
+sudo apt install build-essential -y
+sudo apt-get install manpages-dev -y
+gcc --version
+
+sudo apt install make -y
+make --version
+
+sudo apt update && sudo apt upgrade -y
+sudo apt remove --purge linux-headers-* -y
+
+sudo apt autoremove && sudo apt autoclean -y
+
+sudo apt install linux-headers-$(uname -r) -y
+
+sudo git clone https://github.com/Diegomrza/respaldo.git
+sudo git fetch origin main
+sudo git checkout dev
+
+cd /home/ubuntu/sopes/respaldo/Proyecto1/mods
+
+# compilar e instalar el modulo de RAM
+cd RAM
+
+sudo make all
+sudo insmod ram_201901429.ko
+sudo make clean
+
+cd ..
+
+cd CPU
+sudo make all
+sudo insmod cpu_201901429.ko
+sudo make clean
+
+cd ..
+
+cd ..
+cd agente
+
+sudo docker-compose up --build
