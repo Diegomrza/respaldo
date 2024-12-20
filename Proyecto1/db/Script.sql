@@ -2,31 +2,25 @@
 
 USE datos;
 
-CREATE TABLE cpu (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    usage_ FLOAT NOT NULL
-);
-
-CREATE TABLE process (
-    pid INT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    user INT NOT NULL,
-    state INT NOT NULL,
-    ram FLOAT NOT NULL,
-    father INT,
-    cpu_id INT,
-    FOREIGN KEY (cpu_id) REFERENCES cpu(id)
-);
-
+-- Tabla de RAM
 CREATE TABLE ram (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    total FLOAT NOT NULL,
-    free FLOAT NOT NULL,
-    used FLOAT NOT NULL,
-    perc FLOAT NOT NULL
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  total FLOAT NOT NULL,
+  free FLOAT NOT NULL,
+  used FLOAT NOT NULL,
+  perc FLOAT NOT NULL,
+  ip VARCHAR(100) NOT NULL  -- Columna para almacenar la IP de la máquina
 );
 
-CREATE TABLE ip (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    ip_address VARCHAR(45) NOT NULL
+-- Tabla de Procesos
+CREATE TABLE process (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  pid INT,
+  name VARCHAR(255) NOT NULL,
+  user INT NOT NULL,
+  state INT NOT NULL,
+  ram FLOAT NOT NULL,
+  father INT,
+  perc FLOAT NOT NULL,
+  ip VARCHAR(100) NOT NULL  -- Columna para almacenar la IP de la máquina
 );

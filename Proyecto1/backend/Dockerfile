@@ -10,7 +10,7 @@ COPY . .
 # Instalar dependencias si las hay
 RUN go mod tidy
 
-# EXPOSE 5200
+EXPOSE 5200
 
 # Comando para compilar y ejecutar el programa Go
 CMD ["go", "run", "main.go"]

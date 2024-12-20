@@ -1,39 +1,45 @@
-version: "3.8"
+version: "3.0"
 
 services:
   mysql:
-    # build: ./db # Usamos el Dockerfile del directorio actual
-    image: diegomrza/mysql_db:latest
+    image: diegomrza/mysql_db:latest # build: ./db
     container_name: mysql-container
-    environment:
-      - MYSQL_ROOT_PASSWORD=1234
-      - MYSQL_DATABASE=datos
-      - MYSQL_USER=squery
-      - MYSQL_PASSWORD=1234
     ports:
-      - "3306:3306" # Exponer el puerto 3306
+      - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql # Volumen para persistir los datos
+      - mysql_data:/var/lib/mysql
       - ./db/Script.sql:/docker-entrypoint-initdb.d/Script.sql # Script de inicialización
-    restart: unless-stopped # Reiniciar el contenedor si se detiene inesperadamente
+    restart: always
+
   imggo:
-    # build: ./backend # Usar el Dockerfile del directorio backend
-    image: diegomrza/goservice:latest
+    image: diegomrza/goservice:latest # build: ./backend    
     container_name: go-container
     ports:
-      - "5200:5200" # Exponer el puerto 5200
-    restart: unless-stopped # Reiniciar el contenedor si se detiene inesperadamente
+      - "5200:5200"
+    restart: always
+
   nodejs:
-    # build: ./api # Usar el Dockerfile del directorio nodejs
-    image: diegomrza/nodejsapi:latest
+    image: diegomrza/nodejsapi:latest # build: ./api
     container_name: nodejs-container
     ports:
-      - "3000:3000" # Exponer el puerto 3000
-    restart: unless-stopped # Reiniciar el contenedor si se detiene inesperadamente
+      - "8000:8000"
+    restart: always
     depends_on:
-      - mysql # Dependencia del servicio mysql
+      - mysql
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana-container
+  #   ports:
+  #     - "3000:3000" # Exponer el puerto 3001
+  #   restart: always
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana # Volumen para persistir los datos
+  #   depends_on:
+  #     - mysql
 
-# Definir un volumen persistente para los datos
 volumes:
   mysql_data:
-    driver: local
+  grafana_data:
