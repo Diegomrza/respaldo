@@ -9,14 +9,16 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./db/Script.sql:/docker-entrypoint-initdb.d/Script.sql # Script de inicialización
+    networks:
+      - grafana-network
     restart: always
 
-  imggo:
-    image: diegomrza/goservice:latest # build: ./backend    
-    container_name: go-container
-    ports:
-      - "5200:5200"
-    restart: always
+  # imggo:
+  #   image: diegomrza/goservice:latest # build: ./backend    
+  #   container_name: go-container
+  #   ports:
+  #     - "5200:5200"
+  #   restart: always
 
   nodejs:
     image: diegomrza/nodejsapi:latest # build: ./api
@@ -26,19 +28,26 @@ services:
     restart: always
     depends_on:
       - mysql
-  # grafana:
-  #   image: grafana/grafana:latest
-  #   container_name: grafana-container
-  #   ports:
-  #     - "3000:3000" # Exponer el puerto 3001
-  #   restart: always
-  #   environment:
-  #     - GF_SECURITY_ADMIN_PASSWORD=admin
-  #     - GF_SECURITY_ADMIN_USER=admin
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana # Volumen para persistir los datos
-  #   depends_on:
-  #     - mysql
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-container
+    ports:
+      - "3000:3000" # Exponer el puerto 3001
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    networks:
+      - grafana-network
+    volumes:
+      - grafana_data:/var/lib/grafana # Volumen para persistir los datos
+    depends_on:
+      - mysql
+
+networks:
+  grafana-network:
+    driver: bridge
 
 volumes:
   mysql_data:
