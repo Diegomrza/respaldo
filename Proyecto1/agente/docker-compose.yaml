@@ -1,0 +1,10 @@
+version: "3.0"
+
+services:
+
+imggo:
+  image: diegomrza/goservice:latest # build: ./backend    
+  container_name: go-container
+  ports:
+    - "5200:5200"
+  restart: always

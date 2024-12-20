@@ -84,7 +84,7 @@ func postScheduledData() {
 			cpu_info.Ip = ip  // Añadir la IP a la estructura de datos
 
 			//Mandar el post
-			url := "http://34.60.2.190:8000/cpu"
+			url := "http://nodejs-container:8000/cpu"
 			// fmt.Println(url)
 
 			//Manda cpu_info que es un json
@@ -134,7 +134,7 @@ func postScheduledData() {
 			ram_info.Ip = ip  // Añadir la IP a la estructura de datos
 
 			// Mandar respuesta
-			url = "http://34.60.2.190:8000/ram"
+			url = "http://nodejs-container:8000/ram"
 			// fmt.Println(url)
 
 			// Manda ram_info que es un json
