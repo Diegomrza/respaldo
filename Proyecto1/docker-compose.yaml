@@ -11,12 +11,12 @@ services:
       - ./db/Script.sql:/docker-entrypoint-initdb.d/Script.sql # Script de inicialización
     restart: always
 
-  imggo:
-    image: diegomrza/goservice:latest # build: ./backend    
-    container_name: go-container
-    ports:
-      - "5200:5200"
-    restart: always
+  # imggo:
+  #   image: diegomrza/goservice:latest # build: ./backend    
+  #   container_name: go-container
+  #   ports:
+  #     - "5200:5200"
+  #   restart: always
 
   nodejs:
     image: diegomrza/nodejsapi:latest # build: ./api
@@ -26,6 +26,17 @@ services:
     restart: always
     depends_on:
       - mysql
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-container
+    ports:
+      - "9090:9090"
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - nodejs
 
   grafana:
     image: grafana/grafana:latest
